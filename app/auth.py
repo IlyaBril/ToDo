@@ -5,7 +5,7 @@ from flask import (Blueprint, flash, g, redirect, render_template, request, sess
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from todo.db import get_db
+from .db import get_db
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level='INFO')
