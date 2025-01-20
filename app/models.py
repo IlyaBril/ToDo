@@ -53,5 +53,5 @@ class Task(db.Model):
                 else:                
                     a[k] = str(i)
         #logger.info('def to dict {}'.format(self.claims_qty))
-        a['claims_qty'] =self.claims_qty
+       
         return a

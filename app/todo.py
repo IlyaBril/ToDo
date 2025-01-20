@@ -1,6 +1,7 @@
 import functools
 import logging
 from datetime import date
+from sqlalchemy import func, select
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -10,13 +11,22 @@ from flask import (
 )
 
 from sqlalchemy.orm import Session
-from sqlalchemy import func, select
+from sqlalchemy import func, select, insert
 
-from .db import db
+from .models import db
 from .auth import login_required
 from .models import Task
 
 todobp = Blueprint('todo', __name__, url_prefix='/')
+
+def first_row_check(db):
+    query = db.session.execute(select(Task)).first() is None
+    logger.info('first row {}'.format(query))
+    if query is True:
+        task = Task()
+        db.session.add(task)
+        db.session.commit()
+
 
 
 @login_required
@@ -70,12 +80,23 @@ def data():
 
 @todobp.route('/api/data', methods=['POST'])
 def update():
+    logger.info('POST requested')
     data = request.get_json()
+    logger.info('POST requested {}'.format(data))
     if 'id' not in data:
         abort(400)
     task = Task.query.get(data['id'])
+    logger.info('Task quey {}'. format(task))
     for field in ['description', 'category', 'responsible', 'remind', 'start_date', 'due_date', 'finish_date', 'remark']:
         if field in data:
-            setattr(task, field, data[field])
+            logger.info('if is instfiled {} '.format(isinstance(getattr(Task, field)._Annotated__element.type, db.Date)))
+            if isinstance(getattr(Task, field)._Annotated__element.type, db.Date):
+                logger.info('set attribute task {} field {} date from iso {}'.format(task, field, date.fromisoformat(data[field])))
+                setattr(task, field, date.fromisoformat(data[field]))
+            else: 
+                setattr(task, field, data[field])
+                logger.info('set attribute field {} data {} '.format(field, data[field]))
+
     db.session.commit()
+    
     return '', 204

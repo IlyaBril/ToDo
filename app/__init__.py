@@ -2,6 +2,7 @@ import os
 import logging
 from flask import Flask
 from .config import DevelopmentConfig
+from .todo import first_row_check
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level='INFO')
@@ -18,6 +19,8 @@ def create_app(mode=None):
     db.init_app(app)
     with app.app_context():
         db.create_all()
+        first_row_check(db)
+       
 
     from . import auth
     app.register_blueprint(auth.bp)
@@ -26,6 +29,8 @@ def create_app(mode=None):
     from . import todo
     app.register_blueprint(todo.todobp)
     logger.info('todo bp registered')
+
+    
 
     @app.route('/hello')
     def hello():
