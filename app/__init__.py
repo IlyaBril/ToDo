@@ -19,7 +19,7 @@ def create_app(mode=None):
     db.init_app(app)
     with app.app_context():
         db.create_all()
-        first_row_check(db)
+        #first_row_check(db)
        
 
     from . import auth

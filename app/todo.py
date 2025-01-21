@@ -13,32 +13,38 @@ from flask import (
 from sqlalchemy.orm import Session
 from sqlalchemy import func, select, insert
 
-from .models import db
+from .models import Task, db
 from .auth import login_required
-from .models import Task
 
 todobp = Blueprint('todo', __name__, url_prefix='/')
 
+
 def first_row_check(db):
-    query = db.session.execute(select(Task)).first() is None
+    query = db.session.execute(select(Task).where(Task.user_id==g.user.id)).first() is None
     logger.info('first row {}'.format(query))
     if query is True:
-        task = Task()
+        task = Task(user_id=g.user.id)
         db.session.add(task)
         db.session.commit()
 
 
-
-@login_required
 @todobp.route('/')
+@login_required
 def index():
     return render_template('tables/todo_table.html')
 
 
+@todobp.route('/delete_row', methods=['GET'])
 @login_required
+def delete_func():
+    return render_template('tables/todo_table.html')
+
+
+
 @todobp.route('/api/data')
+@login_required
 def data():
-    query = Task.query
+    query = Task.query.where(Task.user_id==g.user.id)
 
     # search filter
     search = request.args.get('search')
@@ -96,7 +102,8 @@ def update():
             else: 
                 setattr(task, field, data[field])
                 logger.info('set attribute field {} data {} '.format(field, data[field]))
-
+    logger.info(' g.user {}'.format(g.user.id))
+    #setattr(task, 'remark', str(g.user.id))
     db.session.commit()
     
     return '', 204

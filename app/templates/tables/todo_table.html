@@ -10,14 +10,26 @@
   </head>
   <body>
     <div>
-      <h1>Editable Table</h1>
+      <h1>ToDo List</h1>
+   <a href="{{ url_for('auth.logout') }}">Log Out</a>
       <hr>
       <div id="table"></div>
+
     </div>
     <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+<script>
+function myFunction() {
+    var table = document.getElementById("myTable");
+    var row = table.insertRow(-1);
+    var cell1 = row.insertCell(-1);
+
+    cell1.innerHTML = "<?php echo $insert; ?>";
+}
+</script>
+
     <script>
       const tableDiv = document.getElementById('table');
-
+    
       const updateUrl = (prev, query) => {
         return prev + (prev.indexOf('?') >= 0 ? '&' : '?') + new URLSearchParams(query).toString();
       };
@@ -39,9 +51,16 @@
           { id: 'responsible', name: 'Responsible', 'attributes': editableCellAttributes },
           { id: 'remind_date', name: 'Remind Date', 'attributes': editableCellAttributes },
           { id: 'start_date', name: 'Start Date', 'attributes': editableCellAttributes },
-		  { id: 'due_date', name: 'Due Date', 'attributes': editableCellAttributes },
+          { id: 'due_date', name: 'Due Date', 'attributes': editableCellAttributes },
 		  { id: 'finish_date', name: 'Finish Date', 'attributes': editableCellAttributes },
-		  { id: 'remark', name: 'Remark', sort: false, 'attributes': editableCellAttributes }
+		  { id: 'remark', name: 'Remark', sort: false, 'attributes': editableCellAttributes },
+{ 
+        name: 'Actions',
+        formatter: (_, row) => gridjs.html(`<form action="/delete_row/"${row}"" formmethod="get">
+  <button type="submit">Delete</button>`)
+      },
+
+
         ],
         server: {
           url: 'api/data',
@@ -115,7 +134,7 @@
       });
     </script>
 
-<form action="/add_row" method="get">
+  <form action="/add_row" method="get">
   <button type="submit">Search</button>
 </form>
   </body>

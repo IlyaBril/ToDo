@@ -37,7 +37,7 @@ class Task(db.Model):
     start_date = db.Column(db.Date)
     due_date = db.Column(db.Date)
     finish_date = db.Column(db.Date)
-    remark = db.Column(db.Date)
+    remark = db.Column(db.String(64))
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
   
     user_relation =  relationship("User", back_populates="task_relation")
