@@ -11,17 +11,17 @@ from flask import (
 )
 
 from sqlalchemy.orm import Session
-from sqlalchemy import func, select, insert
+from sqlalchemy import func, select, insert, delete
 
-from .models import Task, db
+from .models import User, Task, db
 from .auth import login_required
 
 todobp = Blueprint('todo', __name__, url_prefix='/')
 
 
-def first_row_check(db):
+def first_row_check():
     query = db.session.execute(select(Task).where(Task.user_id==g.user.id)).first() is None
-    logger.info('first row {}'.format(query))
+    task=Task()
     if query is True:
         task = Task(user_id=g.user.id)
         db.session.add(task)
@@ -31,13 +31,38 @@ def first_row_check(db):
 @todobp.route('/')
 @login_required
 def index():
+    user_id = session['user_id']
+
+    query = db.session.execute(select(Task).where(Task.user_id==user_id)).first() is None
+    logger.info('first row {}'.format(query))
+    logger.info('Task {}'.format(Task))
+    if query is True:
+        task = Task()
+        task.user_id=user_id
+        db.session.add(task)
+        db.session.commit()
+
     return render_template('tables/todo_table.html')
 
 
-@todobp.route('/delete_row', methods=['GET'])
+@todobp.route('/delete_row/<id>')
 @login_required
-def delete_func():
-    return render_template('tables/todo_table.html')
+def delete_row(id):
+    db.session.execute(delete(Task).where(Task.id==id))
+    db.session.commit()
+    
+   
+    return  redirect('/', code=302, Response=None)
+
+
+@todobp.route('/add_row', methods=['GET'])
+@login_required
+def add_raw():
+    task = Task()
+    task.user_id=g.user.id
+    db.session.add(task)
+    db.session.commit()
+    return  redirect('/', code=302, Response=None)
 
 
 
@@ -48,6 +73,7 @@ def data():
 
     # search filter
     search = request.args.get('search')
+    
     if search:
         query = query.filter(db.or_(
             Task.description.like(f'%{search}%'),
@@ -57,12 +83,14 @@ def data():
 
     # sorting
     sort = request.args.get('sort')
+    logger.info('sort : {}'.format(sort))
     if sort:
         order = []
         for s in sort.split(','):
             direction = s[0]
             description = s[1:]
-            if description not in ['description', 'remark', 'category']:
+            logger.info('sort description   {}  '.format(description))
+            if description not in ['description', 'category']:
                 description = 'description'
             col = getattr(Task, description)
             if direction == '-':
@@ -92,12 +120,12 @@ def update():
     if 'id' not in data:
         abort(400)
     task = Task.query.get(data['id'])
-    logger.info('Task quey {}'. format(task))
-    for field in ['description', 'category', 'responsible', 'remind', 'start_date', 'due_date', 'finish_date', 'remark']:
+
+    for field in ['description', 'category', 'responsible', 'remind_date', 'start_date', 'due_date', 'finish_date', 'remark']:
         if field in data:
-            logger.info('if is instfiled {} '.format(isinstance(getattr(Task, field)._Annotated__element.type, db.Date)))
+            #logger.info('if is instfiled {} '.format(isinstance(getattr(Task, field)._Annotated__element.type, db.Date)))
             if isinstance(getattr(Task, field)._Annotated__element.type, db.Date):
-                logger.info('set attribute task {} field {} date from iso {}'.format(task, field, date.fromisoformat(data[field])))
+               # logger.info('set attribute task {} field {} date from iso {}'.format(task, field, date.fromisoformat(data[field])))
                 setattr(task, field, date.fromisoformat(data[field]))
             else: 
                 setattr(task, field, data[field])

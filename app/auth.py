@@ -64,14 +64,12 @@ def login():
             session.clear()
             session['user_id'] = user.id
 
-            query = db.session.execute(select(Task).where(Task.user_id==user.id)).first() is None
-            logger.info('first row {}'.format(query))
-            logger.info('Task {}'.format(Task))
-            if query is True:
-                task = Task()
-                task.user_id=user.id
-                db.session.add(task)
-                db.session.commit()
+           # query = db.session.execute(select(Task).where(Task.user_id==user.id)).first() is None
+           # if query is True:
+            #    task = Task()
+             #   task.user_id=user.id
+              #  db.session.add(task)
+               # db.session.commit()
 
             return redirect(url_for('todo.index'))
 

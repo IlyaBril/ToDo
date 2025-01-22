@@ -17,8 +17,10 @@
 
     </div>
     <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+    
 <script>
-function myFunction() {
+
+    function myFunction() {
     var table = document.getElementById("myTable");
     var row = table.insertRow(-1);
     var cell1 = row.insertCell(-1);
@@ -49,19 +51,33 @@ function myFunction() {
           { id: 'description', name: 'Description', 'attributes': editableCellAttributes },
           { id: 'category', name: 'Category', 'attributes': editableCellAttributes },
           { id: 'responsible', name: 'Responsible', 'attributes': editableCellAttributes },
-          { id: 'remind_date', name: 'Remind Date', 'attributes': editableCellAttributes },
-          { id: 'start_date', name: 'Start Date', 'attributes': editableCellAttributes },
-          { id: 'due_date', name: 'Due Date', 'attributes': editableCellAttributes },
-		  { id: 'finish_date', name: 'Finish Date', 'attributes': editableCellAttributes },
-		  { id: 'remark', name: 'Remark', sort: false, 'attributes': editableCellAttributes },
-{ 
+          { id: 'remind_date', name: 'Remind Date', 'attributes': editableCellAttributes, sort: false },
+          { id: 'start_date', name: 'Start Date', 'attributes': editableCellAttributes, sort: false  },
+          { id: 'due_date', name: 'Due Date', 'attributes': editableCellAttributes, sort: false  },
+          { id: 'finish_date', name: 'Finish Date', 'attributes': editableCellAttributes, sort: false  },
+          { id: 'remark', name: 'Remark', sort: false, 'attributes': editableCellAttributes, sort: false,  width: '5%'   },
+          { 
         name: 'Actions',
-        formatter: (_, row) => gridjs.html(`<form action="/delete_row/"${row}"" formmethod="get">
-  <button type="submit">Delete</button>`)
+        formatter: (_, row) => gridjs.html(`<form action= "  /delete_row/${row.cells[0].data} "  formmethod="get">
+  <button type="submit">Delete </button>`)
       },
 
-
         ],
+
+resizable: true,
+        pagination: true,
+        style: {
+            td: {
+                padding: '5px', 
+            },
+            th: {
+                padding: '5px', 'text-align': 'center'
+            },
+            table: {
+                 'font-size': '12px'
+            }
+         },
+
         server: {
           url: 'api/data',
           then: results => results.data,
@@ -80,7 +96,7 @@ function myFunction() {
           multiColumn: true,
           server: {
             url: (prev, columns) => {
-              const columnIds = ['id', 'description', 'category', 'responsible', 'remind_date', 'start_date', 'due_date', 'finish_date', 'remark'];
+              const columnIds = ['id', 'description', 'category'];
               const sort = columns.map(col => (col.direction === 1 ? '+' : '-') + columnIds[col.index]);
               return updateUrl(prev, {sort});
             },
@@ -135,8 +151,13 @@ function myFunction() {
     </script>
 
   <form action="/add_row" method="get">
-  <button type="submit">Search</button>
+  <button type="submit">Add Row</button>
+
+<body>
+<small> -date format YYYY-MM-DD</small>
+</body>
 </form>
-  </body>
+  
+</body>
 
 </html>
