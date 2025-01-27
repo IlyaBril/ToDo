@@ -98,7 +98,7 @@ resizable: true,
           multiColumn: true,
           server: {
             url: (prev, columns) => {
-              const columnIds = ['id', 'description', 'category'];
+              const columnIds = ['prob_no', 'model'];
               const sort = columns.map(col => (col.direction === 1 ? '+' : '-') + columnIds[col.index]);
               return updateUrl(prev, {sort});
             },
