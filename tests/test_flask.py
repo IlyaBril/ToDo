@@ -1,10 +1,13 @@
 import json
 import pytest
+import logging
 from sqlalchemy import func, select, update
-from app.models import User, Task
+from src.app.models import User, Task
 from .conftest import _db
-from flask import current_app
+from flask import current_app, g
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 def test_math_route(client) -> None:
     resp = client.get("/test_route?number=8")
@@ -22,11 +25,15 @@ def test_app_config(app):
 def test_add_task(client):
     """Создание задачи"""
 
-    client.post('/api/data', data={'user_id': 1,
-                                  'description': 'description 2',
+    resp = client.post('/api/data', json={'id': '1',
+                                  'description': 'description 2'
                                  })
+    logger.info('task data {}'.format(resp))
+    
 
-    resp = client.get("/api/data")
-    assert resp.status_code == 200
-    #assert resp.json == {'user_id': 1,
-     #                             'description': 'description 2',}
+    assert resp.status_code == 204
+    g.user = 1
+
+    resp = client.get("/api/data?search=description", )
+    assert resp.status_code == 302
+    assert resp.json == 'true'

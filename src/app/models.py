@@ -7,7 +7,7 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 
-class Base(DeclarativeBase, MappedAsDataclass):
+class Base(DeclarativeBase):
   pass
 
 db = SQLAlchemy(model_class=Base)

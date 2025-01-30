@@ -1,8 +1,12 @@
 import pytest
 from flask import template_rendered
-from app.models import (User, Task, db as _db)
-from app import create_app
-from app.config import TestingConfig
+from src.app.models import User, Task, db as _db
+from src import create_app
+from src.app.config import TestingConfig
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 @pytest.fixture
@@ -11,13 +15,8 @@ def app():
 
     with _app.app_context():
         _db.create_all()
-        user = User(id=1,
-                    username='username',
-                    password='password')
-
-        task = Task(description='description',
-                          category='category',
-                          remind_date='2024-01-01')
+        user = User(id=1, username='username', password='password')
+        task = Task(user_id=1)
 
         _db.session.add(user)
         _db.session.add(task)
@@ -47,7 +46,7 @@ def captured_templates(app):
         template_rendered.disconnect(record, app)
 
 
-@pytest.fixture
-def db(app):
-    with app.app_context():
-        yield _db
+#@pytest.fixture
+#def db(app):
+ #   with app.app_context():
+  #      yield _db

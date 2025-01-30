@@ -87,7 +87,6 @@ def load_logged_in_user():
     else:
         #g.user = db.execute('SELECT * FROM user WHERE id = ?', (user_id,)).fetchone()
         g.user = db.session.execute(select(User).where(User.id == user_id)).scalar_one_or_none() 
-        logger.info('user type {}'.format(type(g.user)))
         
 
 

@@ -2,8 +2,8 @@ import factory
 import factory.fuzzy as fuzzy
 import random
 
-from app.models import db
-from app.models import User, Task
+from src.app.models import db
+from src.app.models import User, Task
 
 
 class UserFactory(factory.alchemy.SQLAlchemyModelFactory):

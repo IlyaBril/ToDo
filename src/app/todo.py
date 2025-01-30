@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, abort
+    Blueprint, flash, jsonify, g, redirect, render_template, request, session, url_for, abort
 )
 
 from sqlalchemy.orm import Session
@@ -26,6 +26,14 @@ def first_row_check():
         task = Task(user_id=g.user.id)
         db.session.add(task)
         db.session.commit()
+
+
+@todobp.route("/test_route")
+def math_route():
+    """Тестовый роут для расчета степени"""
+    number = int(request.args.get("number", 0))
+    result = number ** 2
+    return jsonify(result)
 
 
 @todobp.route('/')
@@ -105,9 +113,13 @@ def data():
     if start != -1 and length != -1:
         query = query.offset(start).limit(length)
 
-    # response
+    #result = {
+    #    'data': [item.to_dict() for item in query],
+    #    'total': total,
+    #}
+    #logger.info('result {}'.format(result))
     return {
-        'data': [user.to_dict() for user in query],
+        'data': [item.to_dict() for item in query],
         'total': total,
     }
 
@@ -130,7 +142,7 @@ def update():
             else: 
                 setattr(task, field, data[field])
                 logger.info('set attribute field {} data {} '.format(field, data[field]))
-    logger.info(' g.user {}'.format(g.user.id))
+    #logger.info(' g.user {}'.format(g.user.id))
     #setattr(task, 'remark', str(g.user.id))
     db.session.commit()
     
